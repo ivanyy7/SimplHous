@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": ["verify-relations.ts"]
+}

@@ -12,7 +12,8 @@
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate deploy",
     "db:seed": "npx --yes prisma db seed",
-    "db:studio": "npx prisma studio"
+    "db:studio": "npx prisma studio",
+    "db:verify": "npx ts-node -P prisma/tsconfig.verify.json prisma/verify-relations.ts"
   },
   "prisma": {
     "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
