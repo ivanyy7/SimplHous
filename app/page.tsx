@@ -11,7 +11,7 @@ export default async function HomePage() {
     <main style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
       <h1>SimplHous</h1>
       <p>
-        <a href="/view-db">view-db</a> — просмотр таблиц и CRUD
+        <a href="/login">Вход</a> · <a href="/dashboard">Личный кабинет</a> · <a href="/view-db">view-db</a> (таблицы и CRUD)
       </p>
       <p>Данные из PostgreSQL (Neon):</p>
       {notes.length === 0 ? (
