@@ -8,6 +8,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true, // нужен для Vercel и прокси, чтобы редиректы работали
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
