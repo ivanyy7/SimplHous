@@ -32,13 +32,15 @@ const delegateKey: Record<ViewDbTableName, keyof PrismaClient> = {
   Tag: "tag",
 };
 
-export function getDelegate(client: PrismaClient, table: ViewDbTableName) {
-  return client[delegateKey[table]] as {
-    findMany: (args: { skip?: number; take?: number; orderBy?: unknown }) => Promise<unknown[]>;
-    findUnique: (args: { where: { id: string } }) => Promise<unknown | null>;
-    create: (args: { data: Record<string, unknown> }) => Promise<unknown>;
-    update: (args: { where: { id: string }; data: Record<string, unknown> }) => Promise<unknown>;
-    delete: (args: { where: { id: string } }) => Promise<unknown>;
-    count: () => Promise<number>;
-  };
+export type TableDelegate = {
+  findMany: (args: { skip?: number; take?: number; orderBy?: unknown }) => Promise<unknown[]>;
+  findUnique: (args: { where: { id: string } }) => Promise<unknown | null>;
+  create: (args: { data: Record<string, unknown> }) => Promise<unknown>;
+  update: (args: { where: { id: string }; data: Record<string, unknown> }) => Promise<unknown>;
+  delete: (args: { where: { id: string } }) => Promise<unknown>;
+  count: () => Promise<number>;
+};
+
+export function getDelegate(client: PrismaClient, table: ViewDbTableName): TableDelegate {
+  return client[delegateKey[table]] as unknown as TableDelegate;
 }
