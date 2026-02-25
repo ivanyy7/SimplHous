@@ -1,6 +1,6 @@
 /**
  * Конфигурация Auth.js (NextAuth v5) для ProStore.
- * OAuth Google, server-side сессии, Prisma-адаптер (пользователь создаётся в БД при первом входе).
+ * OAuth Google, JWT-сессии (чтобы middleware в Edge не обращался к БД), Prisma — только User/Account.
  */
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
@@ -16,19 +16,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   session: {
-    strategy: "database",
+    strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 дней
-    updateAge: 24 * 60 * 60,   // обновлять сессию раз в сутки
   },
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    // В сессии доступен userId — стабильный id пользователя из БД
-    session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
-      }
+    jwt({ token, user }) {
+      if (user) token.id = user.id;
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user) session.user.id = token.id as string;
       return session;
     },
   },

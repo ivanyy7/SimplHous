@@ -15,7 +15,7 @@ export default async function LoginPage() {
   return (
     <main style={styles.main}>
       <div style={styles.card}>
-        <h1 style={styles.title}>ProStore</h1>
+        <h1 style={styles.title}>SimplHous</h1>
         <p style={styles.subtitle}>Войдите, чтобы управлять промтами</p>
 
         <form

@@ -72,8 +72,8 @@ GOOGLE_CLIENT_SECRET="GOCSPX-xxx"
 
 ## Чек-лист выполнения
 
-- [ ] Выполнить в терминале: `npx auth secret` → скопировать вывод в `AUTH_SECRET` в `.env`
-- [ ] Открыть [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials)
-- [ ] Создать OAuth 2.0 Client ID (Web application), добавить redirect URI `http://localhost:3000/api/auth/callback/google`
-- [ ] Вставить Client ID и Client Secret в `.env` в `GOOGLE_CLIENT_ID` и `GOOGLE_CLIENT_SECRET`
-- [ ] Сохранить `.env` и перезапустить `pnpm dev`
+- [x] Выполнить в терминале: `npx auth secret` → скопировать вывод в `AUTH_SECRET` в `.env`
+- [x] Открыть [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials)
+- [x] Создать OAuth 2.0 Client ID (Web application), добавить redirect URI `http://localhost:3000/api/auth/callback/google`
+- [x] Вставить Client ID и Client Secret в `.env` в `GOOGLE_CLIENT_ID` и `GOOGLE_CLIENT_SECRET`
+- [x] Сохранить `.env` и перезапустить `pnpm dev`

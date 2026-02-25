@@ -2,7 +2,7 @@
  * Middleware: защита маршрутов /dashboard и /my-prompts.
  * Неавторизованных пользователей редиректим на /login.
  */
-import NextResponse from "next/server";
+import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
 // Маршруты, требующие авторизации
