@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Visibility {
@@ -77,11 +78,13 @@ model Prompt {
   title      String
   content    String?    @db.Text
   visibility Visibility @default(PRIVATE)
+  isFavorite Boolean    @default(false) @map("is_favorite")
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 
   @@index([userId])
   @@index([userId, visibility])
+  @@index([userId, isFavorite])
 }
 
 model Note {

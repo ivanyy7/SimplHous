@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 export default async function HomePage() {
+  // Главная не должна нагружать БД на каждый запрос в dev.
+  // Это снижает вероятность таймаута пула соединений (особенно на Neon).
   const notes = await prisma.note.findMany({
     orderBy: { createdAt: "desc" },
+    take: 20,
   });
 
   return (
