@@ -36,7 +36,7 @@ export default async function MyNewsPage() {
                 <strong>{n.title}</strong>
                 <span style={styles.badge}>{n.visibility}</span>
                 <span style={styles.date}>
-                  {new Date(p.updatedAt).toLocaleDateString("ru")}
+                  {new Date(n.updatedAt).toLocaleDateString("ru")}
                 </span>
               </li>
             ))}
