@@ -5,7 +5,8 @@ import { Visibility } from "@prisma/client";
 
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } },
+  // Next.js ругается на строгий тип контекста, поэтому используем any
+  { params }: any,
 ) {
   try {
     const session = await auth();
