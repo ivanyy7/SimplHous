@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Star, Pencil, Trash2, Globe, Lock } from "lucide-react";
+import { MessageSquare, Star, Pencil, Trash2, Globe, Lock, Copy, CheckSquare, Calendar } from "lucide-react";
 import { useTransition } from "react";
 import { deleteNews, toggleNewsPublic, toggleNewsFavorite } from "@/app/dashboard/actions";
 import { Visibility } from "@prisma/client";
@@ -8,7 +8,7 @@ import { NewsDialog } from "./NewsDialog";
 import { useState } from "react";
 import { LikeButton } from "./LikeButton";
 
-const PREVIEW_MAX_LEN = 120;
+const PREVIEW_MAX_LEN = 140;
 
 function preview(text: string | null): string {
   if (!text?.trim()) return "";
@@ -23,9 +23,11 @@ interface NewsCardProps {
     content: string | null;
     visibility: Visibility;
     isFavorite: boolean;
+    createdAt: Date;
     updatedAt: Date;
     likesCount?: number;
     likedByMe?: boolean;
+    votesCount?: number;
   };
   isOwner: boolean;
   showLikes?: boolean;
@@ -56,39 +58,41 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
     });
   };
 
+  const handleCopy = async () => {
+    const text = `${news.title}\n\n${news.content ?? ""}`.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Текст объявления скопирован.");
+    } catch {
+      alert("Не удалось скопировать текст.");
+    }
+  };
+
+  const created = new Date(news.createdAt);
+  const formattedDate = created.toLocaleDateString("ru-RU");
+  const votes = news.votesCount ?? 0;
+
   return (
     <>
       <div
-        className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md ${
+        className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-[1px] ${
           isPending ? "opacity-70 pointer-events-none" : ""
-        }`}
+        } min-h-[180px] flex`}
       >
-        <div className="flex gap-4">
-          <div className="shrink-0 w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-slate-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 truncate">{news.title}</h3>
-            <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">
-              {preview(news.content) || "—"}
-            </p>
-            {showLikes && (
-              <div className="mt-3">
-                <LikeButton
-                  newsId={news.id}
-                  initialLiked={Boolean(news.likedByMe)}
-                  initialCount={news.likesCount ?? 0}
-                />
+        <div className="flex flex-col h-full gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="shrink-0 w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-slate-500" />
               </div>
-            )}
-          </div>
-          <div className="shrink-0 flex items-center gap-2">
+              <h3 className="font-semibold text-slate-900 truncate">{news.title}</h3>
+            </div>
             {isOwner && (
-              <>
+              <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={handleToggleFavorite}
-                  className="p-2 rounded-lg text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-colors"
                   title={news.isFavorite ? "Убрать из избранного" : "В избранное"}
                 >
                   <Star
@@ -98,7 +102,7 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
                 <button
                   type="button"
                   onClick={handleTogglePublic}
-                  className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors"
                   title={news.visibility === "PUBLIC" ? "Сделать приватным" : "Опубликовать"}
                 >
                   {news.visibility === "PUBLIC" ? (
@@ -107,23 +111,74 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
                     <Lock className="w-4 h-4" />
                   )}
                 </button>
+              </div>
+            )}
+          </div>
+
+          <p className="text-sm text-slate-500 mt-1 leading-snug break-words text-left">
+            {preview(news.content) || "—"}
+          </p>
+
+          <div className="flex flex-col gap-2 mt-auto pt-2 border-t border-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-y-2 text-xs text-slate-500">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="relative group w-9 h-9 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 rounded-md bg-slate-900 px-3 py-1 text-sm text-white opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg z-10">
+                    Голоса: {votes}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="relative group w-9 h-9 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 rounded-md bg-slate-900 px-3 py-1 text-sm text-white opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg z-10">
+                    Дата: {formattedDate}
+                  </span>
+                </button>
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                {showLikes && (
+                  <LikeButton
+                    newsId={news.id}
+                    initialLiked={Boolean(news.likedByMe)}
+                    initialCount={news.likesCount ?? 0}
+                  />
+                )}
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="relative group w-9 h-9 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition"
+                >
+                  <Copy className="w-4 h-4" />
+                  <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 rounded-md bg-slate-900 px-3 py-1 text-sm text-white opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg z-10">
+                    Копировать
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {isOwner && (
+              <div className="flex items-center gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => setEditOpen(true)}
-                  className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors"
-                  title="Редактировать"
+                  className="px-3 py-1.5 rounded-md font-medium border border-sky-100 text-sky-700 bg-sky-50 hover:bg-sky-100"
                 >
-                  <Pencil className="w-4 h-4" />
+                  Правка
                 </button>
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="p-2 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-                  title="Удалить"
+                  className="ml-auto px-3 py-1.5 rounded-md font-medium border border-red-100 text-red-700 bg-red-50 hover:bg-red-100"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  Удалить
                 </button>
-              </>
+              </div>
             )}
           </div>
         </div>

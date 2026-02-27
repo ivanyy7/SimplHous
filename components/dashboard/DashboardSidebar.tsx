@@ -10,6 +10,7 @@ import {
   Bookmark,
   Globe,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/dashboard", label: "News", icon: MessageSquare },
@@ -25,6 +26,15 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const [view, setView] = useState<"list" | "grid">("list");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("simplhous:viewMode");
+    if (stored === "grid" || stored === "list") {
+      setView(stored);
+    }
+  }, []);
 
   return (
     <aside className="w-[280px] min-h-screen flex flex-col bg-gradient-to-b from-sky-50 to-slate-100 border-r border-sky-100/80 shrink-0">
@@ -56,10 +66,18 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(href);
+
+          const hrefWithView =
+            href === "/dashboard" ||
+            href === "/dashboard/public" ||
+            href === "/dashboard/favorites"
+              ? `${href}?view=${view}`
+              : href;
+
           return (
             <Link
               key={href}
-              href={href}
+              href={hrefWithView}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-sky-100 text-sky-800 shadow-sm"
