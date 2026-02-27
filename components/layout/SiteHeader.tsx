@@ -8,7 +8,7 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-slate-900">
+        <Link href="/" className="flex items-center gap-2 font-semibold text-blue-600 hover:text-blue-700">
           SimplHous
         </Link>
         <nav className="flex items-center gap-6 text-sm">
