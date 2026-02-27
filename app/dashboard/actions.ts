@@ -38,6 +38,7 @@ export async function createNews(formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/public");
   revalidatePath("/dashboard/favorites");
+  revalidatePath("/");
   return { ok: true };
 }
 
@@ -67,6 +68,7 @@ export async function updateNews(id: string, formData: FormData) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/public");
   revalidatePath("/dashboard/favorites");
+  revalidatePath("/");
   return { ok: true };
 }
 
@@ -80,6 +82,7 @@ export async function deleteNews(id: string) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/public");
   revalidatePath("/dashboard/favorites");
+  revalidatePath("/");
   return { ok: true };
 }
 
@@ -97,6 +100,7 @@ export async function toggleNewsPublic(id: string) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/public");
   revalidatePath("/dashboard/favorites");
+  revalidatePath("/");
   return { ok: true, visibility: nextVisibility };
 }
 
@@ -113,6 +117,7 @@ export async function toggleNewsFavorite(id: string) {
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/public");
   revalidatePath("/dashboard/favorites");
+  revalidatePath("/");
   return { ok: true };
 }
 
@@ -193,6 +198,7 @@ export async function getPublicNews(
       include: {
         owner: { select: { id: true, name: true } },
         _count: { select: { likes: true } },
+        tags: { select: { id: true, name: true } },
       },
     }),
     prisma.news.count({ where }),
@@ -217,6 +223,89 @@ export async function getPublicNews(
   }));
 
   return { items, total, page, totalPages: Math.ceil(total / PAGE_SIZE) };
+}
+
+const HOME_NEWS_TAKE = 15;
+
+export async function getHomeNewsSections(currentUserId?: string) {
+  const where = { visibility: Visibility.PUBLIC };
+
+  const [recentRaw, popularRaw] = await Promise.all([
+    prisma.news.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: HOME_NEWS_TAKE,
+      include: {
+        owner: { select: { id: true, name: true } },
+        _count: { select: { likes: true } },
+        tags: { select: { id: true, name: true } },
+      },
+    }),
+    prisma.news.findMany({
+      where,
+      orderBy: { likes: { _count: "desc" } },
+      take: HOME_NEWS_TAKE,
+      include: {
+        owner: { select: { id: true, name: true } },
+        _count: { select: { likes: true } },
+        tags: { select: { id: true, name: true } },
+      },
+    }),
+  ]);
+
+  const allIds = [...new Set([...recentRaw.map((n) => n.id), ...popularRaw.map((n) => n.id)])];
+  let likedIds = new Set<string>();
+  if (currentUserId && allIds.length > 0) {
+    const likes = await prisma.like.findMany({
+      where: { userId: currentUserId, newsId: { in: allIds } },
+      select: { newsId: true },
+    });
+    likedIds = new Set(likes.map((l) => l.newsId));
+  }
+
+  const mapItem = (news: (typeof recentRaw)[number]) => ({
+    id: news.id,
+    title: news.title,
+    content: news.content,
+    visibility: news.visibility,
+    isFavorite: news.isFavorite,
+    createdAt: news.createdAt,
+    updatedAt: news.updatedAt,
+    ownerId: news.ownerId,
+    owner: news.owner,
+    tags: news.tags,
+    likesCount: news._count.likes,
+    likedByMe: likedIds.has(news.id),
+  });
+
+  return {
+    recentNews: recentRaw.map(mapItem),
+    popularNews: popularRaw.map(mapItem),
+  };
+}
+
+export async function getPublicNewsById(newsId: string, currentUserId?: string) {
+  const news = await prisma.news.findFirst({
+    where: { id: newsId, visibility: Visibility.PUBLIC },
+    include: {
+      owner: { select: { id: true, name: true } },
+      _count: { select: { likes: true } },
+      tags: { select: { id: true, name: true } },
+    },
+  });
+  if (!news) return null;
+  let likedByMe = false;
+  if (currentUserId) {
+    const like = await prisma.like.findUnique({
+      where: { userId_newsId: { userId: currentUserId, newsId: news.id } },
+    });
+    likedByMe = !!like;
+  }
+  return {
+    ...news,
+    likesCount: news._count.likes,
+    likedByMe,
+  };
 }
 
 export async function getFavoriteNews(userId: string, page: number, search?: string) {
