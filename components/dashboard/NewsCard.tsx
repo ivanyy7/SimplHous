@@ -131,13 +131,15 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
                 </button>
               </div>
               <div className="flex items-center gap-2 ml-auto">
-                {showLikes && news.visibility === "PUBLIC" && (
-                  <LikeButton
-                    newsId={news.id}
-                    initialLiked={Boolean(news.likedByMe)}
-                    initialCount={news.likesCount ?? 0}
-                  />
-                )}
+                <div className="w-12 flex justify-center">
+                  {showLikes && news.visibility === "PUBLIC" && (
+                    <LikeButton
+                      newsId={news.id}
+                      initialLiked={Boolean(news.likedByMe)}
+                      initialCount={news.likesCount ?? 0}
+                    />
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={handleCopy}
