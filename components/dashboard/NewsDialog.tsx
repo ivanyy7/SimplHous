@@ -16,7 +16,7 @@ interface NewsDialogProps {
   onClose: () => void;
 }
 
-export function PromptDialog({ mode, prompt, onClose }: NewsDialogProps) {
+export function NewsDialog({ mode, prompt, onClose }: NewsDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -117,3 +117,4 @@ export function PromptDialog({ mode, prompt, onClose }: NewsDialogProps) {
     </div>
   );
 }
+

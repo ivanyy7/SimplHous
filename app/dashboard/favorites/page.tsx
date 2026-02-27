@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getFavoriteNews } from "../actions";
-import { PromptCard } from "@/components/dashboard/PromptCard";
+import { NewsCard } from "@/components/dashboard/NewsCard";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { Pagination } from "@/components/dashboard/Pagination";
 import { Suspense } from "react";
@@ -38,7 +38,7 @@ export default async function DashboardFavoritesPage({
           </p>
         ) : (
           items.map((news) => (
-            <PromptCard key={news.id} news={news} isOwner />
+            <NewsCard key={news.id} news={news} isOwner />
           ))
         )}
       </div>

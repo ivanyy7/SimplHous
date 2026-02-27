@@ -4,8 +4,9 @@ import { MessageSquare, Star, Pencil, Trash2, Globe, Lock } from "lucide-react";
 import { useTransition } from "react";
 import { deleteNews, toggleNewsPublic, toggleNewsFavorite } from "@/app/dashboard/actions";
 import { Visibility } from "@prisma/client";
-import { PromptDialog } from "./PromptDialog";
+import { NewsDialog } from "./NewsDialog";
 import { useState } from "react";
+import { LikeButton } from "./LikeButton";
 
 const PREVIEW_MAX_LEN = 120;
 
@@ -23,11 +24,14 @@ interface NewsCardProps {
     visibility: Visibility;
     isFavorite: boolean;
     updatedAt: Date;
+    likesCount?: number;
+    likedByMe?: boolean;
   };
   isOwner: boolean;
+  showLikes?: boolean;
 }
 
-export function PromptCard({ news, isOwner }: NewsCardProps) {
+export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
   const [isPending, startTransition] = useTransition();
   const [editOpen, setEditOpen] = useState(false);
 
@@ -68,6 +72,15 @@ export function PromptCard({ news, isOwner }: NewsCardProps) {
             <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">
               {preview(news.content) || "—"}
             </p>
+            {showLikes && (
+              <div className="mt-3">
+                <LikeButton
+                  newsId={news.id}
+                  initialLiked={Boolean(news.likedByMe)}
+                  initialCount={news.likesCount ?? 0}
+                />
+              </div>
+            )}
           </div>
           <div className="shrink-0 flex items-center gap-2">
             {isOwner && (
@@ -117,7 +130,7 @@ export function PromptCard({ news, isOwner }: NewsCardProps) {
       </div>
 
       {editOpen && (
-        <PromptDialog
+        <NewsDialog
           mode="edit"
           prompt={news}
           onClose={() => setEditOpen(false)}
@@ -126,3 +139,4 @@ export function PromptCard({ news, isOwner }: NewsCardProps) {
     </>
   );
 }
+

@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getMyNews } from "./actions";
-import { PromptCard } from "@/components/dashboard/PromptCard";
+import { NewsCard } from "@/components/dashboard/NewsCard";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { NewNewsButton } from "@/components/dashboard/NewNewsButton";
 import { Pagination } from "@/components/dashboard/Pagination";
@@ -42,7 +42,7 @@ export default async function DashboardMyNewsPage({
           </p>
         ) : (
           items.map((news) => (
-            <PromptCard key={news.id} news={news} isOwner />
+            <NewsCard key={news.id} news={news} isOwner />
           ))
         )}
       </div>

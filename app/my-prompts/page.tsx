@@ -1,13 +1,13 @@
 /**
- * Мои промты. Только промты текущего пользователя (приватные видны только владельцу).
- * Пример server-side: получаем session, затем запрос в БД по userId.
+ * Мои новости. Только новости текущего пользователя.
+ * Пример server-side: получаем session, затем запрос в БД по ownerId.
  */
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
-export default async function MyPromptsPage() {
+export default async function MyNewsPage() {
   const session = await auth();
   if (!session?.user) {
     redirect("/login");
@@ -15,26 +15,26 @@ export default async function MyPromptsPage() {
 
   const userId = session.user.id;
 
-  // Все промты текущего пользователя (приватные видны только ему)
-  const prompts = await prisma.prompt.findMany({
-    where: { userId },
+  // Все новости текущего пользователя
+  const news = await prisma.news.findMany({
+    where: { ownerId: userId },
     orderBy: { updatedAt: "desc" },
   });
 
   return (
     <main style={styles.main}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Мои промты</h1>
-        <p style={styles.subtitle}>Приватные промты видны только вам</p>
+        <h1 style={styles.title}>Мои новости</h1>
+        <p style={styles.subtitle}>Новости видны только вам</p>
 
-        {prompts.length === 0 ? (
-          <p style={styles.empty}>Промтов пока нет. Создайте первый в личном кабинете или через API.</p>
+        {news.length === 0 ? (
+          <p style={styles.empty}>Новостей пока нет. Создайте первую в личном кабинете.</p>
         ) : (
           <ul style={styles.list}>
-            {prompts.map((p) => (
-              <li key={p.id} style={styles.item}>
-                <strong>{p.title}</strong>
-                <span style={styles.badge}>{p.visibility}</span>
+            {news.map((n) => (
+              <li key={n.id} style={styles.item}>
+                <strong>{n.title}</strong>
+                <span style={styles.badge}>{n.visibility}</span>
                 <span style={styles.date}>
                   {new Date(p.updatedAt).toLocaleDateString("ru")}
                 </span>

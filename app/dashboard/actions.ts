@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { Visibility } from "@prisma/client";
 
 const PAGE_SIZE = 10;
+export type PublicNewsSort = "recent" | "popular";
 
 /** Проверка прав: только владелец может изменять/удалять свою новость */
 async function getUserId() {
@@ -139,7 +140,12 @@ export async function getMyNews(userId: string, page: number, search?: string) {
   return { items, total, page, totalPages: Math.ceil(total / PAGE_SIZE) };
 }
 
-export async function getPublicNews(page: number, search?: string) {
+export async function getPublicNews(
+  page: number,
+  search?: string,
+  currentUserId?: string,
+  sort: PublicNewsSort = "recent",
+) {
   const where = {
     visibility: Visibility.PUBLIC,
     ...(search?.trim()
@@ -151,16 +157,44 @@ export async function getPublicNews(page: number, search?: string) {
         }
       : {}),
   };
-  const [items, total] = await Promise.all([
+
+  const orderBy =
+    sort === "popular"
+      ? { likes: { _count: "desc" as const } }
+      : { createdAt: "desc" as const };
+
+  const [itemsRaw, total] = await Promise.all([
     prisma.news.findMany({
       where,
-      orderBy: { updatedAt: "desc" },
+      orderBy,
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-      include: { user: { select: { id: true, name: true } } },
+      include: {
+        owner: { select: { id: true, name: true } },
+        _count: { select: { likes: true } },
+      },
     }),
     prisma.news.count({ where }),
   ]);
+
+  let likedIds = new Set<string>();
+  if (currentUserId && itemsRaw.length > 0) {
+    const likes = await prisma.like.findMany({
+      where: {
+        userId: currentUserId,
+        newsId: { in: itemsRaw.map((n) => n.id) },
+      },
+      select: { newsId: true },
+    });
+    likedIds = new Set(likes.map((l) => l.newsId));
+  }
+
+  const items = itemsRaw.map((news) => ({
+    ...news,
+    likesCount: news._count.likes,
+    likedByMe: likedIds.has(news.id),
+  }));
+
   return { items, total, page, totalPages: Math.ceil(total / PAGE_SIZE) };
 }
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
-import { PromptDialog } from "./PromptDialog";
+import { NewsDialog } from "./NewsDialog";
 
 export function NewNewsButton() {
   const [open, setOpen] = useState(false);
@@ -24,7 +24,7 @@ export function NewNewsButton() {
         <Plus className="w-4 h-4" />
         New News
       </button>
-      {open && <PromptDialog mode="create" onClose={handleClose} />}
+      {open && <NewsDialog mode="create" onClose={handleClose} />}
     </>
   );
 }
