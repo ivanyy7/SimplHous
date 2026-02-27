@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Star, Pencil, Trash2, Globe, Lock, Copy, CheckSquare, Calendar } from "lucide-react";
+import { MessageSquare, Star, Pencil, Trash2, Globe, Lock, Copy, Calendar } from "lucide-react";
 import { useTransition } from "react";
 import { deleteNews, toggleNewsPublic, toggleNewsFavorite } from "@/app/dashboard/actions";
 import { Visibility } from "@prisma/client";
@@ -27,7 +27,6 @@ interface NewsCardProps {
     updatedAt: Date;
     likesCount?: number;
     likedByMe?: boolean;
-    votesCount?: number;
   };
   isOwner: boolean;
   showLikes?: boolean;
@@ -70,7 +69,6 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
 
   const created = new Date(news.createdAt);
   const formattedDate = created.toLocaleDateString("ru-RU");
-  const votes = news.votesCount ?? 0;
 
   return (
     <>
@@ -126,15 +124,6 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
                   type="button"
                   className="relative group w-9 h-9 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition"
                 >
-                  <CheckSquare className="w-4 h-4" />
-                  <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 rounded-md bg-slate-900 px-3 py-1 text-sm text-white opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg z-10">
-                    Голоса: {votes}
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  className="relative group w-9 h-9 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition"
-                >
                   <Calendar className="w-4 h-4" />
                   <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 rounded-md bg-slate-900 px-3 py-1 text-sm text-white opacity-0 group-hover:opacity-100 transition whitespace-nowrap shadow-lg z-10">
                     Дата: {formattedDate}
@@ -142,7 +131,7 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
                 </button>
               </div>
               <div className="flex items-center gap-2 ml-auto">
-                {showLikes && (
+                {showLikes && news.visibility === "PUBLIC" && (
                   <LikeButton
                     newsId={news.id}
                     initialLiked={Boolean(news.likedByMe)}

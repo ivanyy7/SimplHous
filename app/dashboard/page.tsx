@@ -57,7 +57,12 @@ export default async function DashboardMyNewsPage({
           </p>
         ) : (
           items.map((news) => (
-            <NewsCard key={news.id} news={news} isOwner />
+            <NewsCard
+              key={news.id}
+              news={news}
+              isOwner
+              showLikes
+            />
           ))
         )}
       </div>

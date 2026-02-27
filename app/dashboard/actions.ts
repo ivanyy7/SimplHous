@@ -128,15 +128,36 @@ export async function getMyNews(userId: string, page: number, search?: string) {
         }
       : {}),
   };
-  const [items, total] = await Promise.all([
+
+  const [itemsRaw, total] = await Promise.all([
     prisma.news.findMany({
       where,
       orderBy: { updatedAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
+      include: {
+        _count: { select: { likes: true } },
+      },
     }),
     prisma.news.count({ where }),
   ]);
+
+  const likes = await prisma.like.findMany({
+    where: {
+      userId,
+      newsId: { in: itemsRaw.map((n) => n.id) },
+    },
+    select: { newsId: true },
+  });
+
+  const likedIds = new Set(likes.map((l) => l.newsId));
+
+  const items = itemsRaw.map((news) => ({
+    ...news,
+    likesCount: news._count.likes,
+    likedByMe: likedIds.has(news.id),
+  }));
+
   return { items, total, page, totalPages: Math.ceil(total / PAGE_SIZE) };
 }
 
