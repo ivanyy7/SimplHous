@@ -86,7 +86,7 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
               <h3 className="font-semibold text-slate-900 truncate">{news.title}</h3>
             </div>
             {isOwner && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   type="button"
                   onClick={handleToggleFavorite}
@@ -118,8 +118,8 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
           </p>
 
           <div className="flex flex-col gap-2 mt-auto pt-2 border-t border-slate-100">
-            <div className="flex flex-wrap items-center justify-between gap-y-2 text-xs text-slate-500">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-y-2 text-xs text-slate-500 w-full">
+              <div className="flex items-center gap-3 shrink-0">
                 <button
                   type="button"
                   className="relative group w-9 h-9 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 hover:border-slate-300 transition"
@@ -130,7 +130,7 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
                   </span>
                 </button>
               </div>
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="flex items-center gap-2 ml-auto shrink-0">
                 <div className="w-12 flex justify-center">
                   {showLikes && news.visibility === "PUBLIC" && (
                     <LikeButton
@@ -154,7 +154,7 @@ export function NewsCard({ news, isOwner, showLikes = false }: NewsCardProps) {
             </div>
 
             {isOwner && (
-              <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 text-xs w-full">
                 <button
                   type="button"
                   onClick={() => setEditOpen(true)}
