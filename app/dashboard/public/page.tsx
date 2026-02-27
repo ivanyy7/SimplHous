@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { getPublicPrompts } from "../actions";
+import { getPublicNews } from "../actions";
 import { PromptCard } from "@/components/dashboard/PromptCard";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { Pagination } from "@/components/dashboard/Pagination";
@@ -18,7 +18,7 @@ export default async function DashboardPublicPage({
   const page = Math.max(1, parseInt(params?.page ?? "1", 10) || 1);
   const q = params?.q ?? undefined;
 
-  const { items, totalPages } = await getPublicPrompts(page, q);
+  const { items, totalPages } = await getPublicNews(page, q);
   const currentUserId = session.user.id;
 
   return (
@@ -38,11 +38,11 @@ export default async function DashboardPublicPage({
             Публичных News пока нет
           </p>
         ) : (
-          items.map((prompt) => (
+          items.map((news) => (
             <PromptCard
-              key={prompt.id}
-              prompt={prompt}
-              isOwner={prompt.user.id === currentUserId}
+              key={news.id}
+              news={news}
+              isOwner={news.ownerId === currentUserId}
             />
           ))
         )}

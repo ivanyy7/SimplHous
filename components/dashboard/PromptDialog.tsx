@@ -2,10 +2,10 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { createPrompt, updatePrompt } from "@/app/dashboard/actions";
+import { createNews, updateNews } from "@/app/dashboard/actions";
 import { Visibility } from "@prisma/client";
 
-interface PromptDialogProps {
+interface NewsDialogProps {
   mode: "create" | "edit";
   prompt?: {
     id: string;
@@ -16,7 +16,7 @@ interface PromptDialogProps {
   onClose: () => void;
 }
 
-export function PromptDialog({ mode, prompt, onClose }: PromptDialogProps) {
+export function PromptDialog({ mode, prompt, onClose }: NewsDialogProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -27,13 +27,13 @@ export function PromptDialog({ mode, prompt, onClose }: PromptDialogProps) {
     formData.set("isPublic", (form.querySelector("#isPublic") as HTMLInputElement)?.checked ? "true" : "false");
     startTransition(async () => {
       if (mode === "create") {
-        const result = await createPrompt(formData);
+        const result = await createNews(formData);
         if (result?.ok) {
           router.refresh();
           onClose();
         }
       } else if (prompt) {
-        const result = await updatePrompt(prompt.id, formData);
+        const result = await updateNews(prompt.id, formData);
         if (result?.ok) {
           router.refresh();
           onClose();

@@ -64,27 +64,10 @@ model User {
 
   accounts Account[]
   sessions Session[]
-  notes    Note[]
-  news     News[]
-  votes    Vote[]
-  prompts  Prompt[]
-}
-
-// Промты (Prompt Store): привязаны к пользователю, приватные видит только владелец
-model Prompt {
-  id         String     @id @default(cuid())
-  userId     String     @map("user_id")
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title      String
-  content    String?    @db.Text
-  visibility Visibility @default(PRIVATE)
-  isFavorite Boolean    @default(false) @map("is_favorite")
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  @@index([userId])
-  @@index([userId, visibility])
-  @@index([userId, isFavorite])
+  notes  Note[]
+  news   News[]
+  votes  Vote[]
+  likes  Like[]
 }
 
 model Note {
@@ -106,19 +89,36 @@ model News {
   ownerId     String
   owner       User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   title       String
-  content     String
+  content     String     @db.Text
   description String?
   categoryId  String?
   category    Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   visibility  Visibility @default(PRIVATE)
+  isFavorite  Boolean    @default(false) @map("is_favorite")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   publishedAt DateTime?
   tags        Tag[]
   votes       Vote[]
+  likes       Like[]
 
-  @@index([ownerId, updatedAt])
+  @@index([ownerId])
+  @@index([ownerId, visibility])
+  @@index([ownerId, isFavorite])
   @@index([visibility, createdAt])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  newsId    String
+  news      News     @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, newsId])
+  @@index([newsId])
+  @@index([userId])
 }
 
 model Vote {

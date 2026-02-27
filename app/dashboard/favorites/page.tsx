@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { getFavoritePrompts } from "../actions";
+import { getFavoriteNews } from "../actions";
 import { PromptCard } from "@/components/dashboard/PromptCard";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import { Pagination } from "@/components/dashboard/Pagination";
@@ -18,7 +18,7 @@ export default async function DashboardFavoritesPage({
   const page = Math.max(1, parseInt(params?.page ?? "1", 10) || 1);
   const q = params?.q ?? undefined;
 
-  const { items, totalPages } = await getFavoritePrompts(session.user.id, page, q);
+  const { items, totalPages } = await getFavoriteNews(session.user.id, page, q);
 
   return (
     <div className="p-6 md:p-8 max-w-4xl">
@@ -37,8 +37,8 @@ export default async function DashboardFavoritesPage({
             В избранном пока ничего нет — отметьте звёздочкой нужные News
           </p>
         ) : (
-          items.map((prompt) => (
-            <PromptCard key={prompt.id} prompt={prompt} isOwner />
+          items.map((news) => (
+            <PromptCard key={news.id} news={news} isOwner />
           ))
         )}
       </div>

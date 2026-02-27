@@ -2,11 +2,7 @@
 
 import { MessageSquare, Star, Pencil, Trash2, Globe, Lock } from "lucide-react";
 import { useTransition } from "react";
-import {
-  deletePrompt,
-  togglePromptPublic,
-  togglePromptFavorite,
-} from "@/app/dashboard/actions";
+import { deleteNews, toggleNewsPublic, toggleNewsFavorite } from "@/app/dashboard/actions";
 import { Visibility } from "@prisma/client";
 import { PromptDialog } from "./PromptDialog";
 import { useState } from "react";
@@ -19,8 +15,8 @@ function preview(text: string | null): string {
   return t.length <= PREVIEW_MAX_LEN ? t : t.slice(0, PREVIEW_MAX_LEN) + "…";
 }
 
-interface PromptCardProps {
-  prompt: {
+interface NewsCardProps {
+  news: {
     id: string;
     title: string;
     content: string | null;
@@ -31,28 +27,28 @@ interface PromptCardProps {
   isOwner: boolean;
 }
 
-export function PromptCard({ prompt, isOwner }: PromptCardProps) {
+export function PromptCard({ news, isOwner }: NewsCardProps) {
   const [isPending, startTransition] = useTransition();
   const [editOpen, setEditOpen] = useState(false);
 
   const handleDelete = () => {
-    if (!confirm("Удалить этот News?")) return;
+    if (!confirm("Удалить эту новость?")) return;
     startTransition(async () => {
-      await deletePrompt(prompt.id);
+      await deleteNews(news.id);
     });
   };
 
   const handleTogglePublic = () => {
     if (!isOwner) return;
     startTransition(async () => {
-      await togglePromptPublic(prompt.id);
+      await toggleNewsPublic(news.id);
     });
   };
 
   const handleToggleFavorite = () => {
     if (!isOwner) return;
     startTransition(async () => {
-      await togglePromptFavorite(prompt.id);
+      await toggleNewsFavorite(news.id);
     });
   };
 
@@ -68,9 +64,9 @@ export function PromptCard({ prompt, isOwner }: PromptCardProps) {
             <MessageSquare className="w-5 h-5 text-slate-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 truncate">{prompt.title}</h3>
+            <h3 className="font-semibold text-slate-900 truncate">{news.title}</h3>
             <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">
-              {preview(prompt.content) || "—"}
+              {preview(news.content) || "—"}
             </p>
           </div>
           <div className="shrink-0 flex items-center gap-2">
@@ -80,19 +76,19 @@ export function PromptCard({ prompt, isOwner }: PromptCardProps) {
                   type="button"
                   onClick={handleToggleFavorite}
                   className="p-2 rounded-lg text-slate-400 hover:bg-amber-50 hover:text-amber-600 transition-colors"
-                  title={prompt.isFavorite ? "Убрать из избранного" : "В избранное"}
+                  title={news.isFavorite ? "Убрать из избранного" : "В избранное"}
                 >
                   <Star
-                    className={`w-4 h-4 ${prompt.isFavorite ? "fill-amber-400 text-amber-500" : ""}`}
+                    className={`w-4 h-4 ${news.isFavorite ? "fill-amber-400 text-amber-500" : ""}`}
                   />
                 </button>
                 <button
                   type="button"
                   onClick={handleTogglePublic}
                   className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors"
-                  title={prompt.visibility === "PUBLIC" ? "Сделать приватным" : "Опубликовать"}
+                  title={news.visibility === "PUBLIC" ? "Сделать приватным" : "Опубликовать"}
                 >
-                  {prompt.visibility === "PUBLIC" ? (
+                  {news.visibility === "PUBLIC" ? (
                     <Globe className="w-4 h-4 text-emerald-500" />
                   ) : (
                     <Lock className="w-4 h-4" />
@@ -123,7 +119,7 @@ export function PromptCard({ prompt, isOwner }: PromptCardProps) {
       {editOpen && (
         <PromptDialog
           mode="edit"
-          prompt={prompt}
+          prompt={news}
           onClose={() => setEditOpen(false)}
         />
       )}

@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-export const createPromptSchema = z.object({
+export const createNewsSchema = z.object({
   title: z.string().min(1, "Введите заголовок").max(200),
   content: z.string().max(10000).optional(),
   isPublic: z.boolean().default(false),
 });
 
-export const updatePromptSchema = createPromptSchema;
+export const updateNewsSchema = createNewsSchema;
 
-export type CreatePromptInput = z.infer<typeof createPromptSchema>;
-export type UpdatePromptInput = z.infer<typeof updatePromptSchema>;
+export type CreateNewsInput = z.infer<typeof createNewsSchema>;
+export type UpdateNewsInput = z.infer<typeof updateNewsSchema>;
